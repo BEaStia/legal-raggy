@@ -1,0 +1,23 @@
+default_install_hook_types: [pre-commit, pre-push]
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^docs/source/initial_task\.md$
+      - id: end-of-file-fixer
+        exclude: ^docs/source/initial_task\.md$
+      - id: check-yaml
+  - repo: local
+    hooks:
+      - id: docs-fast
+        name: docs fast audit
+        entry: python scripts/check_docs.py
+        language: system
+        types: [markdown]
+      - id: docs-full
+        name: docs full audit
+        entry: python scripts/check_docs.py --all
+        language: system
+        pass_filenames: false
+        stages: [pre-push]

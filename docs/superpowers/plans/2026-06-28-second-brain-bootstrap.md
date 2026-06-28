@@ -97,4 +97,3 @@ repos:
 - [ ] Проверить восемь задач командой `(Get-ChildItem .tasks/todo -File).Count` с ожидаемым результатом `8`.
 - [ ] Обновить handoff точным следующим действием: начать Task 0001 и переместить только её в `in-progress`.
 - [ ] Зафиксировать реализацию отдельным коммитом `docs: bootstrap project second brain`.
-
