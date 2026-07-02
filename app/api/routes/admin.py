@@ -83,6 +83,7 @@ async def admin_dashboard(request: Request):
     template = env.get_template("admin.html")
     return HTMLResponse(
         template.render(
+            request=request,
             laws=_get_laws_info(),
             archive_count=_get_archive_count(),
             last_update=_get_last_update(),
@@ -114,6 +115,7 @@ async def refresh_laws(request: Request):
     template = env.get_template("admin.html")
     return HTMLResponse(
         template.render(
+            request=request,
             laws=_get_laws_info(),
             archive_count=_get_archive_count(),
             last_update=_get_last_update(),
