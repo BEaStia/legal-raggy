@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Legal-Raggy — Анализ архитектуры{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📝 Описание архитектуры</h2>
+    </div>
+    <form hx-post="/analyze/html" hx-target="#report-container" hx-indicator="#btn-analyze" hx-swap="innerHTML">
+        <textarea name="description" placeholder="У нас B2B SaaS для клиентов. Пользователи регистрируются по email и телефону. Есть личный кабинет и админка. Админка доступна из интернета, MFA пока нет. База данных находится в российском облаке. Логи ошибок отправляются в Sentry, туда может попадать email пользователя. Есть платежный провайдер для оплаты подписки."></textarea>
+        <div style="margin-top: 1rem; display: flex; align-items: center; gap: 1rem;">
+            <button type="submit" class="btn" id="btn-analyze">
+                <span class="btn-text">🚀 Анализировать</span>
+                <span class="spinner">Анализируем...</span>
+            </button>
+            <a href="/analyze/markdown" class="btn btn-secondary" hx-preserve>📥 Скачать Markdown</a>
+        </div>
+    </form>
+</div>
+
+<div id="report-container">
+    <!-- Report will be injected here -->
+</div>
+{% endblock %}
