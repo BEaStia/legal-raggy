@@ -6,7 +6,8 @@ Pipeline:
     -> detect_triggers
     -> retrieve_legal_basis
     -> check_grounding
-    -> finalize
+    -> (grounding passed?) -> finalize -> END
+    -> (grounding failed?) -> warning -> finalize -> END
 """
 
 from collections.abc import Callable
@@ -21,8 +22,16 @@ from app.agents.nodes import (
     extract_profile_node,
     finalize_node,
     retrieve_legal_basis_node,
+    warning_node,
 )
 from app.agents.state import ComplianceState
+
+
+def _route_after_grounding(state: ComplianceState) -> str:
+    """Conditional routing based on grounding check result."""
+    if state.get("grounding_passed"):
+        return "finalize"
+    return "warning"
 
 
 def build_compliance_graph(
@@ -49,7 +58,24 @@ def build_compliance_graph(
     workflow.add_node("detect_triggers", detect_triggers_node)
     workflow.add_node("retrieve_legal_basis", retrieve_node)
     workflow.add_node("check_grounding", check_grounding_node)
+    workflow.add_node("warning", warning_node)
     workflow.add_node("finalize", finalize_node)
+
+    # Wire edges
+    workflow.add_edge(START, "extract_profile")
+    workflow.add_edge("extract_profile", "detect_triggers")
+    workflow.add_edge("detect_triggers", "retrieve_legal_basis")
+    workflow.add_edge("retrieve_legal_basis", "check_grounding")
+
+    # Conditional routing after grounding check
+    workflow.add_conditional_edges(
+        "check_grounding",
+        _route_after_grounding,
+        {"finalize": "finalize", "warning": "warning"},
+    )
+
+    workflow.add_edge("warning", "finalize")
+    workflow.add_edge("finalize", END)
 
     # Wire edges
     workflow.add_edge(START, "extract_profile")

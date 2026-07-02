@@ -104,6 +104,7 @@ def check_grounding_node(state: ComplianceState) -> dict:
     """Verify that triggers have supporting citations.
 
     Simple grounding check: at least one citation exists if triggers exist.
+    Returns routing decision via 'grounding_passed' field.
     """
     triggers = state.get("regulatory_triggers", [])
     citations = state.get("citations", [])
@@ -112,7 +113,23 @@ def check_grounding_node(state: ComplianceState) -> dict:
         return {"grounding_passed": True}
 
     grounding_ok = len(citations) > 0
-    return {"grounding_passed": grounding_ok}
+    return {
+        "grounding_passed": grounding_ok,
+        "errors": [] if grounding_ok else ["grounding: no citations for triggers"],
+    }
+
+
+def warning_node(state: ComplianceState) -> dict:
+    """Add warning when grounding check failed.
+
+    Does not block finalization, but adds a warning to errors list.
+    """
+    return {
+        "errors": state.get("errors", []) + [
+            "WARNING: No citations found for regulatory triggers. "
+            "Assessment may lack legal basis."
+        ],
+    }
 
 
 def finalize_node(state: ComplianceState) -> dict:

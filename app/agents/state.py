@@ -1,5 +1,8 @@
 """LangGraph workflow state for compliance assessment."""
 
+from typing import Annotated
+
+from langgraph.graph.message import add_messages
 from typing_extensions import TypedDict
 
 from app.models import (
@@ -40,4 +43,4 @@ class ComplianceState(TypedDict):
     # Workflow metadata
     grounding_passed: bool | None
     final_assessment: ComplianceAssessment | None
-    errors: list[str]
+    errors: Annotated[list[str], add_messages]
