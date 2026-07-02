@@ -1,14 +1,14 @@
 ---
 id: TASK-0005
 title: Analyze endpoint
-status: todo
-phase: implementation
+status: ready-for-release
+phase: publication
 priority: P1
 owner: project-team
 created_at: 2026-06-28
-started_at: null
-finished_at: null
-last_activity_at: 2026-06-28
+started_at: 2026-07-01
+finished_at: 2026-07-01
+last_activity_at: 2026-07-01
 blocked: false
 article: ../../.articles/0005-analyze-endpoint.md
 ---
@@ -33,4 +33,4 @@ Endpoint принимает `description`, возвращает валидный
 Проверить schema и отсутствие скрытых network calls. Статья: `.articles/0005-analyze-endpoint.md`.
 
 ## Handoff
-Передать assessment TASK-0006.
+`POST /analyze` реализован; 5 API-тестов. Бизнес-логика вынесена в `app/services/analyze.py`, route содержит только схему и делегирование. Передаёт assessment TASK-0006.

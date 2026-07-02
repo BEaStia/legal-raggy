@@ -1,14 +1,14 @@
 ---
 id: TASK-0004
 title: Deterministic compliance rule engine
-status: todo
-phase: implementation
+status: ready-for-release
+phase: publication
 priority: P0
 owner: project-team
 created_at: 2026-06-28
-started_at: null
-finished_at: null
-last_activity_at: 2026-06-28
+started_at: 2026-07-01
+finished_at: 2026-07-01
+last_activity_at: 2026-07-01
 blocked: false
 article: ../../.articles/0004-rule-engine.md
 ---
@@ -33,4 +33,7 @@ TASK-0002; разделы 8 и 15.3 [brief](../../docs/source/initial_task.md).
 P1 для сильного юридического утверждения без basis. Статья: `.articles/0004-rule-engine.md`.
 
 ## Handoff
-Передать pipeline TASK-0005.
+`analyze_profile()` реализован в `app/rules/engine.py`; 16 тестов в `tests/test_rule_engine.py`.
+Реализованы правила: personal data, public SaaS, external integrations, observability,
+admin panel, payments, electronic signature, commercial secret, KII.
+Передаёт pipeline TASK-0005.

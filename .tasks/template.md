@@ -32,4 +32,8 @@ article: ../.articles/0000-example.md
 
 ## Review and risks
 
+## Article
+
+Написать по [`.articles/STYLEGUIDE.md`](../.articles/STYLEGUIDE.md) до перевода в `ready-for-release`.
+
 ## Handoff

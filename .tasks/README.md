@@ -8,4 +8,4 @@ WIP-лимит равен 1. Следующую задачу тянем толь
 
 Начальный SLE: 85% задач завершаются за 3 календарных дня. На 50% SLE проверяем размер и риски; после SLE декомпозируем или разблокируем. После каждой третьей завершённой задачи пересматриваем workflow по WIP, throughput, age и cycle time.
 
-В `ready-for-release` задача попадает только с актуальным review SHA, статьёй, трассировкой, обновлённым handoff и пройденным `.quality/definition-of-done.md`.
+В `ready-for-release` задача попадает только с актуальным review SHA, статьёй по [`.articles/STYLEGUIDE.md`](../.articles/STYLEGUIDE.md), трассировкой, обновлённым handoff и пройденным `.quality/definition-of-done.md`.

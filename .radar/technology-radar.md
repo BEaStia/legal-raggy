@@ -1,9 +1,9 @@
-# Technology Radar — 2026-06-28
+# Technology Radar — 2026-06-30
 
 | Ring | Item | Rationale | Review trigger |
 |---|---|---|---|
 | adopt | Python 3.11+ | Базовый язык из brief, типизация и зрелая экосистема | смена supported runtime |
-| adopt | FastAPI + Pydantic | Типизированный HTTP API и модели | завершение TASK-0002 |
+| adopt | FastAPI + Pydantic | Контракт core-моделей проверен TASK-0002 | изменение публичной схемы моделей |
 | adopt | pytest | Детерминированные тесты MVP | появление первого теста |
 | adopt | Markdown docs-as-code | Единый локальный источник истины | каждая третья задача |
 | trial | pre-commit docs audit | Проверяем workflow до push | после трёх задач |

@@ -19,4 +19,4 @@ review_at: 2026-07-28
 Добавление corpus в TASK-0007 и любое изменение citation mapping.
 
 ## Links
-[TASK-0007](../.tasks/todo/0007-local-corpus-loader.md), [TASK-0008](../.tasks/todo/0008-assessment-citations.md).
+[TASK-0007](../.tasks/ready-for-release/0007-local-corpus-loader.md), [TASK-0008](../.tasks/ready-for-release/0008-assessment-citations.md).

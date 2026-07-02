@@ -1,14 +1,14 @@
 ---
 id: TASK-0001
 title: Project skeleton and health endpoint
-status: todo
-phase: implementation
+status: ready-for-release
+phase: publication
 priority: P0
 owner: project-team
 created_at: 2026-06-28
-started_at: null
-finished_at: null
-last_activity_at: 2026-06-28
+started_at: 2026-06-30
+finished_at: 2026-06-30
+last_activity_at: 2026-06-30
 blocked: false
 article: ../../.articles/0001-project-skeleton.md
 ---

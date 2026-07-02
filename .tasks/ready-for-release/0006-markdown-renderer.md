@@ -1,14 +1,14 @@
 ---
 id: TASK-0006
 title: Markdown assessment renderer
-status: todo
-phase: implementation
+status: ready-for-release
+phase: publication
 priority: P1
 owner: project-team
 created_at: 2026-06-28
-started_at: null
-finished_at: null
-last_activity_at: 2026-06-28
+started_at: 2026-07-01
+finished_at: 2026-07-01
+last_activity_at: 2026-07-01
 blocked: false
 article: ../../.articles/0006-markdown-renderer.md
 ---
@@ -33,4 +33,6 @@ TASK-0002, TASK-0004; разделы 14 и 15.4 [brief](../../docs/source/initia
 Проверить escaping и обязательный disclaimer. Статья: `.articles/0006-markdown-renderer.md`.
 
 ## Handoff
+`render_assessment_markdown()` реализован в `app/generation/renderer.py`; 12 тестов в `tests/test_renderer.py`.
+Отчёт содержит все секции из brief §14: Summary, Profile, Triggers, Red flags, Controls, Questions, Sources, Human review, Disclaimer.
 Продолжить TASK-0007.

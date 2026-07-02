@@ -91,8 +91,7 @@ repos:
 
 **Files:** создать `.articles/0000-second-brain-before-project-setup.md`, обновить `.handoff/current-state.md` и evidence в DoD.
 
-- [ ] Написать русскоязычную статью: проблема, подход, Kanban, ADR/radar/handoff, review, hooks, ограничения и дальнейший цикл.
-- [ ] Сохранить юмористически-саркастический тон без искажения технических фактов.
+- [ ] Написать русскоязычную статью по `.articles/STYLEGUIDE.md`: проблема, подход, Kanban, ADR/radar/handoff, review, hooks, ограничения и дальнейший цикл.
 - [ ] Запустить `python scripts/check_docs.py --all`, `python -m unittest -v`, `git diff --check`.
 - [ ] Проверить восемь задач командой `(Get-ChildItem .tasks/todo -File).Count` с ожидаемым результатом `8`.
 - [ ] Обновить handoff точным следующим действием: начать Task 0001 и переместить только её в `in-progress`.

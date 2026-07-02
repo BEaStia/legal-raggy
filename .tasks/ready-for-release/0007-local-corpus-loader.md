@@ -1,14 +1,14 @@
 ---
 id: TASK-0007
 title: Local Markdown corpus loader and search
-status: todo
-phase: implementation
+status: ready-for-release
+phase: publication
 priority: P1
 owner: project-team
 created_at: 2026-06-28
-started_at: null
-finished_at: null
-last_activity_at: 2026-06-28
+started_at: 2026-07-01
+finished_at: 2026-07-01
+last_activity_at: 2026-07-01
 blocked: false
 article: ../../.articles/0007-local-corpus-loader.md
 ---
@@ -33,4 +33,8 @@ Chunks содержат provenance; релевантный документ на
 Проверить path traversal, deterministic ordering и source metadata. Статья: `.articles/0007-local-corpus-loader.md`.
 
 ## Handoff
-Передать retrieved chunks TASK-0008.
+`KeywordRetriever` реализован в `app/retrieval/keyword.py`; 22 теста в `tests/test_retrieval.py`.
+Корпус: 8 законов в `data/raw/laws/`, 12 архитектурных карточек в `data/raw/architecture_cards/`.
+Chunks содержат provenance (chunk_id, document_title, source_path, heading, metadata).
+Поиск детерминирован, работает без embeddings и сети.
+Продолжить TASK-0008.

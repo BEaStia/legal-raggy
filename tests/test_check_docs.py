@@ -4,7 +4,6 @@ from pathlib import Path
 
 from scripts.check_docs import audit_repository
 
-
 TASK = """---
 id: {id}
 title: Example
@@ -72,7 +71,8 @@ class AuditTests(unittest.TestCase):
 
     def test_rejects_broken_relative_link(self):
         path = self.write_task(".tasks/todo/0001-a.md", "TASK-0001")
-        path.write_text(path.read_text(encoding="utf-8") + "\n[missing](missing.md)\n", encoding="utf-8")
+        broken = path.read_text(encoding="utf-8") + "\n[missing](missing.md)\n"
+        path.write_text(broken, encoding="utf-8")
         self.assertTrue(any("broken link" in e for e in audit_repository(self.root)))
 
 
