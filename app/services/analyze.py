@@ -5,9 +5,11 @@ from pathlib import Path
 from app.models import ArchitectureProfile, ComplianceAssessment
 from app.rules.architecture_patterns import extract_architecture_profile
 from app.rules.engine import analyze_profile
-from app.services.citations import attach_citations
+from app.services.citations import attach_citation
 
-_DEFAULT_LAWS_DIR = Path(__file__).parent.parent.parent / "data" / "raw" / "laws"
+_DEFAULT_LAWS_DIR = (
+    Path(__file__).parent.parent.parent / "data" / "raw" / "laws"
+)
 
 
 def run_analysis(
@@ -27,7 +29,7 @@ def run_analysis(
     dirs = laws_dirs if laws_dirs else [_DEFAULT_LAWS_DIR]
     for d in dirs:
         if d.is_dir():
-            attach_citations(assessment, d)
+            attach_citation(assessment, d)
             break
 
     return assessment

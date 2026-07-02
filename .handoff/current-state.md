@@ -10,6 +10,7 @@
 - **TASK-0001–0008**: Milestone 1 — детерминированный compliance MVP (97 тестов).
 - **TASK-0009**: Qdrant + embeddings infrastructure — `DenseRetriever`, sentence-transformers, docker-compose с Qdrant.
 - **TASK-0010**: Hybrid retrieval — `HybridRetriever` с RRF, объединение keyword + dense scores.
+- **TASK-0011**: Hybrid citations — `attach_citation()` с hybrid retrieval и fallback на keyword.
 - **REVIEW-0002**: passed; замечаний нет.
 - **REVIEW-0003**: passed; замечаний нет.
 
@@ -28,4 +29,4 @@
 
 ## Exact next action
 
-Начать **TASK-0010** (hybrid retrieval) — объединить keyword + dense scores.
+Провести Milestone 2 flow review. Решить, готов ли Milestone 3 (LLM structured extraction).

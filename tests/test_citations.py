@@ -12,7 +12,7 @@ from app.models import (
     RegulatoryTrigger,
 )
 from app.services.analyze import run_analysis
-from app.services.citations import attach_citations
+from app.services.citations import attach_citation
 
 
 class TestAttachCitations:
@@ -50,7 +50,7 @@ class TestAttachCitations:
             )
         )
 
-        result = attach_citations(assessment, laws_dir)
+        result = attach_citation(assessment, laws_dir)
         assert len(result.citations) >= 1
         assert any("152" in c.document_title for c in result.citations)
 
@@ -77,7 +77,7 @@ class TestAttachCitations:
             )
         )
 
-        result = attach_citations(assessment, laws_dir)
+        result = attach_citation(assessment, laws_dir)
         assert len(result.citations) >= 1
         assert any("63" in c.document_title for c in result.citations)
 
@@ -103,7 +103,7 @@ class TestAttachCitations:
             )
         )
 
-        result = attach_citations(assessment, laws_dir)
+        result = attach_citation(assessment, laws_dir)
         assert len(result.citations) >= 1
         assert any("98" in c.document_title for c in result.citations)
 
@@ -120,7 +120,7 @@ class TestAttachCitations:
             disclaimer="test",
         )
 
-        result = attach_citations(assessment, laws_dir)
+        result = attach_citation(assessment, laws_dir)
         assert result.citations == []
 
     def test_citations_have_provenance(self, laws_dir: Path) -> None:
@@ -146,7 +146,7 @@ class TestAttachCitations:
             )
         )
 
-        result = attach_citations(assessment, laws_dir)
+        result = attach_citation(assessment, laws_dir)
         for citation in result.citations:
             assert citation.chunk_id is not None
             assert citation.source is not None
@@ -174,7 +174,7 @@ class TestAttachCitations:
             )
         )
 
-        result = attach_citations(assessment, Path("/nonexistent/path"))
+        result = attach_citation(assessment, Path("/nonexistent/path"))
         assert result.citations == []
 
 
