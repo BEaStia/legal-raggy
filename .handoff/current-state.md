@@ -17,6 +17,8 @@
 - **TASK-0015**: Grounding check + conditional routing — warning node при отсутствии citations, `add_conditional_edges`.
 - **TASK-0016**: Evaluation framework — golden dataset (20 cases), precision/recall/citation coverage metrics.
 - **TASK-0017**: Real laws fetcher — `scripts/fetch_laws.py` downloads 8 laws from consultant.ru with version tracking.
+- **TASK-0018**: Auto-update laws via cron (pending).
+- **TASK-0019**: Hybrid citations in production — hybrid retrieval integrated with fallback to keyword, 6 comparison tests.
 - **REVIEW-0002**: passed; замечаний нет.
 - **REVIEW-0003**: passed; замечаний нет.
 
