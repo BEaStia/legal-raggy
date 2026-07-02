@@ -9,7 +9,9 @@ description = "Preliminary IT architecture compliance review under Russian regul
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "beautifulsoup4>=4.12.0",
     "fastapi>=0.115.0",
+    "httpx>=0.28.0",
     "pydantic>=2.10.0",
     "pyyaml>=6.0",
     "qdrant-client>=1.12.0",
