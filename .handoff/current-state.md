@@ -9,6 +9,7 @@
 - Шаг 0: second brain, Kanban, ADR, radar, risks, docs auditor, pre-commit.
 - **TASK-0001–0008**: Milestone 1 — детерминированный compliance MVP (97 тестов).
 - **TASK-0009**: Qdrant + embeddings infrastructure — `DenseRetriever`, sentence-transformers, docker-compose с Qdrant.
+- **TASK-0010**: Hybrid retrieval — `HybridRetriever` с RRF, объединение keyword + dense scores.
 - **REVIEW-0002**: passed; замечаний нет.
 - **REVIEW-0003**: passed; замечаний нет.
 
