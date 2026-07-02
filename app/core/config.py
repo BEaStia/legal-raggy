@@ -15,7 +15,7 @@ class Settings:
 
     LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "")
     LLM_API_KEY: str = os.getenv("LLM_API_KEY", "")
-    LLM_MODEL: str = os.getenv("LLM_MODEL", "qwen/qwen3.6-plus")
+    LLM_MODEL: str = os.getenv("LLM_MODEL", "qwen/qwen3.7-plus")
     LLM_BASE_URL: str = os.getenv("LLM_BASE_URL", "")
 
     @property
