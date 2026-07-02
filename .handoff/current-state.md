@@ -15,6 +15,7 @@
 - **TASK-0013**: LLM integration — `run_analysis()` с OpenRouter/Qwen3.6-plus support, env var config.
 - **TASK-0014**: LangGraph workflow — `app/agents/` с state, nodes, graph. extract→detect→retrieve→grounding→finalize.
 - **TASK-0015**: Grounding check + conditional routing — warning node при отсутствии citations, `add_conditional_edges`.
+- **TASK-0016**: Evaluation framework — golden dataset (20 cases), precision/recall/citation coverage metrics.
 - **REVIEW-0002**: passed; замечаний нет.
 - **REVIEW-0003**: passed; замечаний нет.
 
