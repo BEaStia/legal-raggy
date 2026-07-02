@@ -13,6 +13,7 @@
 - **TASK-0011**: Hybrid citations — `attach_citation()` с hybrid retrieval и fallback на keyword.
 - **TASK-0012**: LLM-based extraction — `extract_with_llm()` с Pydantic validation и heuristic fallback.
 - **TASK-0013**: LLM integration — `run_analysis()` с OpenRouter/Qwen3.6-plus support, env var config.
+- **TASK-0014**: LangGraph workflow — `app/agents/` с state, nodes, graph. extract→detect→retrieve→grounding→finalize.
 - **REVIEW-0002**: passed; замечаний нет.
 - **REVIEW-0003**: passed; замечаний нет.
 
