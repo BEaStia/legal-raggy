@@ -29,16 +29,10 @@ _TRIGGER_QUERIES: dict[str, str] = {
     "security_measures_required": "требования к защите персональных данных",
     "electronic_signature_regulation": "электронная подпись ЭП УКЭП",
     "commercial_secret_possible": "коммерческая тайна конфиденциальность",
-    "payment_regulation_possible": (
-        "платёжные операции перевод National Payment System"
-    ),
+    "payment_regulation_possible": ("платёжные операции перевод National Payment System"),
     "kii_relevance_possible": "критическая информационная инфраструктура КИИ",
-    "possible_cross_border_transfer": (
-        "трансграничная передача персональных данных"
-    ),
-    "external_processor_or_transfer_unknown": (
-        "передача данных обработчик третьим лицам"
-    ),
+    "possible_cross_border_transfer": ("трансграничная передача персональных данных"),
+    "external_processor_or_transfer_unknown": ("передача данных обработчик третьим лицам"),
 }
 
 
@@ -154,12 +148,10 @@ def _attach_with_hybrid(
         create_collection(qdrant_client, settings.QDRANT_COLLECTION)
         index_chunks(qdrant_client, chunks, settings.QDRANT_COLLECTION)
     except Exception as e:
-        logger.warning("Failed to index corpus in Qdrant: %s", e)
+        logger.warning("Failed to ensure corpus in Qdrant: %s", e)
         return _attach_with_keyword(assessment, keyword_retriever, top_k)
 
-    dense_retriever = DenseRetriever(
-        qdrant_client, settings.QDRANT_COLLECTION
-    )
+    dense_retriever = DenseRetriever(qdrant_client, settings.QDRANT_COLLECTION)
     hybrid = HybridRetriever(keyword_retriever, dense_retriever)
 
     return _attach_with_retriever(assessment, hybrid, top_k)

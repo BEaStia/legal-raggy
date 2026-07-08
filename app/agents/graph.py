@@ -77,14 +77,6 @@ def build_compliance_graph(
     workflow.add_edge("warning", "finalize")
     workflow.add_edge("finalize", END)
 
-    # Wire edges
-    workflow.add_edge(START, "extract_profile")
-    workflow.add_edge("extract_profile", "detect_triggers")
-    workflow.add_edge("detect_triggers", "retrieve_legal_basis")
-    workflow.add_edge("retrieve_legal_basis", "check_grounding")
-    workflow.add_edge("check_grounding", "finalize")
-    workflow.add_edge("finalize", END)
-
     # Bind node kwargs
     graph = workflow.compile()
     return graph

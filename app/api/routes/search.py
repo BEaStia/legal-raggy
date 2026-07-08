@@ -18,15 +18,13 @@ from app.retrieval.qdrant_store import (
 
 router = APIRouter()
 
-LAWS_DIR = Path("data/raw/laws")
+LAWS_DIR = Path(__file__).parent.parent.parent.parent / "data" / "raw" / "laws"
 
 
 class SearchRequest(BaseModel):
     query: str = Field(..., min_length=3, description="Search query text")
     top_k: int = Field(5, ge=1, le=20, description="Number of results")
-    mode: Literal["keyword", "dense", "hybrid"] = Field(
-        "hybrid", description="Retrieval mode"
-    )
+    mode: Literal["keyword", "dense", "hybrid"] = Field("hybrid", description="Retrieval mode")
 
 
 class SearchResult(BaseModel):
@@ -61,14 +59,14 @@ def _get_dense_retriever() -> DenseRetriever | None:
     try:
         client = QdrantClient(url=settings.qdrant_url, timeout=5)
         client.get_collections()
-        
-        # Ensure collection exists and is indexed
+
+        # Index corpus only if collection is empty
         if LAWS_DIR.exists():
             chunks = load_corpus(LAWS_DIR)
             if chunks:
                 create_collection(client, settings.QDRANT_COLLECTION)
                 index_chunks(client, chunks, settings.QDRANT_COLLECTION)
-        
+
         return DenseRetriever(client, settings.QDRANT_COLLECTION)
     except Exception:
         return None
@@ -78,11 +76,11 @@ def _get_dense_retriever() -> DenseRetriever | None:
 async def search_corpus(request: SearchRequest):
     """Search the legal corpus using keyword, dense, or hybrid retrieval."""
     results: list = []
-    
+
     if request.mode == "keyword":
         retriever = _get_keyword_retriever()
         results = retriever.search(request.query, top_k=request.top_k)
-    
+
     elif request.mode == "dense":
         dense_retriever = _get_dense_retriever()
         if dense_retriever is None:
@@ -91,18 +89,18 @@ async def search_corpus(request: SearchRequest):
                 detail="Dense retrieval unavailable: Qdrant not connected",
             )
         results = dense_retriever.search(request.query, top_k=request.top_k)
-    
+
     elif request.mode == "hybrid":
         kw_retriever = _get_keyword_retriever()
         dense_retriever = _get_dense_retriever()
-        
+
         if dense_retriever is None:
             # Fallback to keyword if Qdrant unavailable
             results = kw_retriever.search(request.query, top_k=request.top_k)
         else:
             hybrid = HybridRetriever(kw_retriever, dense_retriever)
             results = hybrid.search(request.query, top_k=request.top_k)
-    
+
     else:
         raise HTTPException(status_code=400, detail=f"Unknown mode: {request.mode}")
 

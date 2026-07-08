@@ -1,4 +1,4 @@
-"""Tests for the POST /analyze endpoint."""
+"""Tests for the POST /api/v1/analyze endpoint."""
 
 from fastapi.testclient import TestClient
 
@@ -9,7 +9,7 @@ client = TestClient(app)
 
 def test_analyze_returns_compliance_assessment() -> None:
     response = client.post(
-        "/analyze",
+        "/api/v1/analyze",
         json={
             "description": (
                 "У нас B2B SaaS, пользователи регистрируются по email и телефону. "
@@ -44,20 +44,20 @@ def test_analyze_returns_compliance_assessment() -> None:
 
 
 def test_analyze_rejects_empty_description() -> None:
-    response = client.post("/analyze", json={"description": ""})
+    response = client.post("/api/v1/analyze", json={"description": ""})
 
     assert response.status_code == 422
 
 
 def test_analyze_rejects_missing_description() -> None:
-    response = client.post("/analyze", json={})
+    response = client.post("/api/v1/analyze", json={})
 
     assert response.status_code == 422
 
 
 def test_analyze_preserves_source_description() -> None:
     description = "Internal service без пользовательских данных."
-    response = client.post("/analyze", json={"description": description})
+    response = client.post("/api/v1/analyze", json={"description": description})
 
     assert response.status_code == 200
     body = response.json()
@@ -66,7 +66,7 @@ def test_analyze_preserves_source_description() -> None:
 
 def test_analyze_no_triggers_for_minimal_service() -> None:
     response = client.post(
-        "/analyze",
+        "/api/v1/analyze",
         json={"description": "Внутренний сервис без данных и интеграций."},
     )
 

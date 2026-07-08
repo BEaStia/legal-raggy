@@ -120,8 +120,7 @@ def _rule_personal_data(profile: ArchitectureProfile, triggers: list[RegulatoryT
         id="personal_data_processing",
         title="Обработка персональных данных",
         description=(
-            "Обнаружены признаки обработки персональных данных "
-            "(email, телефон, ФИО и др.)."
+            "Обнаружены признаки обработки персональных данных (email, телефон, ФИО и др.)."
         ),
         basis=["152-ФЗ"],
         confidence=Confidence.high,
@@ -216,9 +215,9 @@ def _rule_external_integrations(
         return
 
     risky_integrations = [
-        i for i in profile.integrations
-        if i.type in _INTEGRATION_TYPES_WITH_DATA_RISK
-        and i.sends_personal_data in (True, None)
+        i
+        for i in profile.integrations
+        if i.type in _INTEGRATION_TYPES_WITH_DATA_RISK and i.sends_personal_data in (True, None)
     ]
     if not risky_integrations:
         return
@@ -286,9 +285,7 @@ def _rule_observability(
         flags,
         id="possible_personal_data_in_logs",
         title="Возможные ПДн в логах",
-        description=(
-            "Логи и observability-сервисы могут содержать персональные данные."
-        ),
+        description=("Логи и observability-сервисы могут содержать персональные данные."),
         severity=Severity.medium,
     )
 
@@ -564,9 +561,7 @@ def analyze_profile(profile: ArchitectureProfile) -> ComplianceAssessment:
 
     summary_parts: list[str] = []
     if pd_detected:
-        summary_parts.append(
-            "Обнаружены признаки обработки персональных данных."
-        )
+        summary_parts.append("Обнаружены признаки обработки персональных данных.")
     if profile.has_logs_or_observability:
         summary_parts.append(
             "Присутствует логирование/observability; необходимо проверить наличие ПДн в логах."

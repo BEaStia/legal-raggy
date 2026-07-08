@@ -8,9 +8,7 @@ from app.rules.engine import analyze_profile
 from app.rules.llm_extractor import extract_with_llm
 from app.services.citations import attach_citation
 
-_DEFAULT_LAWS_DIR = (
-    Path(__file__).parent.parent.parent / "data" / "raw" / "laws"
-)
+_DEFAULT_LAWS_DIR = Path(__file__).parent.parent.parent / "data" / "raw" / "laws"
 
 
 def run_analysis(
@@ -27,9 +25,7 @@ def run_analysis(
         llm_fn: Optional LLM callable for structured extraction.
                 If None, uses heuristic extractor.
     """
-    profile: ArchitectureProfile = extract_with_llm(
-        description, llm_fn=llm_fn
-    )
+    profile: ArchitectureProfile = extract_with_llm(description, llm_fn=llm_fn)
     assessment: ComplianceAssessment = analyze_profile(profile)
 
     dirs = laws_dirs if laws_dirs else [_DEFAULT_LAWS_DIR]

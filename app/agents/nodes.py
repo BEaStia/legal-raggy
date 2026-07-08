@@ -85,12 +85,8 @@ def retrieve_legal_basis_node(
             recommended_controls=state.get("recommended_controls", []),
             clarification_questions=state.get("clarification_questions", []),
             citations=[],
-            needs_human_security_review=state.get(
-                "needs_human_security_review", True
-            ),
-            needs_human_legal_review=state.get(
-                "needs_human_legal_review", True
-            ),
+            needs_human_security_review=state.get("needs_human_security_review", True),
+            needs_human_legal_review=state.get("needs_human_legal_review", True),
             disclaimer=state.get("disclaimer", ""),
         )
         result = attach_citation(assessment, laws)
@@ -125,10 +121,8 @@ def warning_node(state: ComplianceState) -> dict:
     Does not block finalization, but adds a warning to errors list.
     """
     return {
-        "errors": state.get("errors", []) + [
-            "WARNING: No citations found for regulatory triggers. "
-            "Assessment may lack legal basis."
-        ],
+        "errors": state.get("errors", [])
+        + ["WARNING: No citations found for regulatory triggers. Assessment may lack legal basis."],
     }
 
 
@@ -147,12 +141,8 @@ def finalize_node(state: ComplianceState) -> dict:
             recommended_controls=state.get("recommended_controls", []),
             clarification_questions=state.get("clarification_questions", []),
             citations=state.get("citations", []),
-            needs_human_security_review=state.get(
-                "needs_human_security_review", True
-            ),
-            needs_human_legal_review=state.get(
-                "needs_human_legal_review", True
-            ),
+            needs_human_security_review=state.get("needs_human_security_review", True),
+            needs_human_legal_review=state.get("needs_human_legal_review", True),
             disclaimer=state.get("disclaimer", ""),
         )
         return {"final_assessment": assessment, "errors": []}

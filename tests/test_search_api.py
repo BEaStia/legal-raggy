@@ -11,7 +11,7 @@ class TestSearchEndpoint:
     def test_search_keyword_mode(self) -> None:
         """Test keyword search."""
         resp = client.post(
-            "/search",
+            "/api/v1/search",
             json={"query": "персональные данные", "mode": "keyword", "top_k": 3},
         )
         assert resp.status_code == 200
@@ -27,7 +27,7 @@ class TestSearchEndpoint:
     def test_search_hybrid_mode(self) -> None:
         """Test hybrid search (fallback to keyword if no Qdrant)."""
         resp = client.post(
-            "/search",
+            "/api/v1/search",
             json={"query": "электронная подпись", "mode": "hybrid", "top_k": 5},
         )
         assert resp.status_code == 200
@@ -38,7 +38,7 @@ class TestSearchEndpoint:
     def test_search_dense_mode_unavailable(self) -> None:
         """Test dense search fails gracefully without Qdrant."""
         resp = client.post(
-            "/search",
+            "/api/v1/search",
             json={"query": "тест", "mode": "dense", "top_k": 5},
         )
         # Should return 503 if Qdrant is not running
@@ -47,7 +47,7 @@ class TestSearchEndpoint:
     def test_search_validation_error(self) -> None:
         """Test validation for short query."""
         resp = client.post(
-            "/search",
+            "/api/v1/search",
             json={"query": "аб", "mode": "keyword"},
         )
         assert resp.status_code == 422
@@ -55,7 +55,7 @@ class TestSearchEndpoint:
     def test_search_validation_top_k(self) -> None:
         """Test validation for top_k limits."""
         resp = client.post(
-            "/search",
+            "/api/v1/search",
             json={"query": "тест", "mode": "keyword", "top_k": 100},
         )
         assert resp.status_code == 422
@@ -63,7 +63,7 @@ class TestSearchEndpoint:
     def test_search_results_structure(self) -> None:
         """Test search result structure."""
         resp = client.post(
-            "/search",
+            "/api/v1/search",
             json={"query": "коммерческая тайна", "mode": "keyword"},
         )
         assert resp.status_code == 200

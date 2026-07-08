@@ -46,9 +46,7 @@ def evaluate_case(case: GoldenCase) -> EvalResult:
     predicted_categories = {c.value for c in profile.data_categories}
     expected_categories = set(case.expected_data_categories)
 
-    trigger_precision, trigger_recall = _precision_recall(
-        predicted_triggers, expected_triggers
-    )
+    trigger_precision, trigger_recall = _precision_recall(predicted_triggers, expected_triggers)
     category_precision, category_recall = _precision_recall(
         predicted_categories, expected_categories
     )

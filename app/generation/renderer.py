@@ -52,13 +52,10 @@ def _render_profile(a: ComplianceAssessment) -> str:
         if admin.exists:
             if admin.exposed_to_internet is not None:
                 lines.append(
-                    f"  - Exposed to internet: "
-                    f"{'yes' if admin.exposed_to_internet else 'no'}"
+                    f"  - Exposed to internet: {'yes' if admin.exposed_to_internet else 'no'}"
                 )
             if admin.mfa_enabled is not None:
-                lines.append(
-                    f"  - MFA: {'enabled' if admin.mfa_enabled else 'disabled'}"
-                )
+                lines.append(f"  - MFA: {'enabled' if admin.mfa_enabled else 'disabled'}")
 
     if p.integrations:
         lines.append("- **Integrations**:")
@@ -116,9 +113,7 @@ def _render_controls(a: ComplianceAssessment) -> str:
         lines.append(f"- **Description**: {control.description}")
         lines.append(f"- **Priority**: {control.priority.value}")
         if control.related_triggers:
-            lines.append(
-                f"- **Related triggers**: {', '.join(control.related_triggers)}"
-            )
+            lines.append(f"- **Related triggers**: {', '.join(control.related_triggers)}")
         lines.append("")
 
     return "\n".join(lines)
@@ -134,9 +129,7 @@ def _render_questions(a: ComplianceAssessment) -> str:
         lines.append(f"- **Question**: {question.question}")
         lines.append(f"- **Reason**: {question.reason}")
         if question.related_triggers:
-            lines.append(
-                f"- **Related triggers**: {', '.join(question.related_triggers)}"
-            )
+            lines.append(f"- **Related triggers**: {', '.join(question.related_triggers)}")
         lines.append("")
 
     return "\n".join(lines)
@@ -167,12 +160,10 @@ def _render_citations(a: ComplianceAssessment) -> str:
 def _render_human_review(a: ComplianceAssessment) -> str:
     lines = ["## Human review\n"]
     lines.append(
-        f"- **Human security review required**: "
-        f"{'yes' if a.needs_human_security_review else 'no'}"
+        f"- **Human security review required**: {'yes' if a.needs_human_security_review else 'no'}"
     )
     lines.append(
-        f"- **Human legal review required**: "
-        f"{'yes' if a.needs_human_legal_review else 'no'}"
+        f"- **Human legal review required**: {'yes' if a.needs_human_legal_review else 'no'}"
     )
     lines.append("")
     return "\n".join(lines)

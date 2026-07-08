@@ -1,4 +1,4 @@
-"""Fetch real Russian laws from consultant.ru and convert to Markdown.
+"""Fetch real Russian laws from pravo.gov.ru and convert to Markdown.
 
 Usage:
     python scripts/fetch_laws.py              # fetch all configured laws
@@ -22,52 +22,52 @@ logger = logging.getLogger(__name__)
 LAWS_DIR = Path(__file__).parent.parent / "data" / "raw" / "laws"
 ARCHIVE_DIR = LAWS_DIR / "archive"
 
-# Document IDs on consultant.ru
+# Document IDs on pravo.gov.ru
 LAW_IDS = {
     "152fz_personal_data": {
-        "url": "https://www.consultant.ru/document/cons_doc_LAW_61801/",
+        "url": "http://pravo.gov.ru/proxy/ips/?docbody&nd=102108261",
         "title": 'Федеральный закон 152-ФЗ «О персональных данных»',
         "type": "federal_law",
         "domain": "personal_data",
     },
     "149fz_information": {
-        "url": "https://www.consultant.ru/document/cons_doc_LAW_160243/",
+        "url": "https://pravo.gov.ru/prod/otspage?law=149-FZ",
         "title": 'Федеральный закон 149-ФЗ «Об информации, информационных технологиях и о защите информации»',
         "type": "federal_law",
         "domain": "information_technology",
     },
     "63fz_electronic_signature": {
-        "url": "https://www.consultant.ru/document/cons_doc_LAW_32080/",
+        "url": "https://pravo.gov.ru/prod/otspage?law=63-FZ",
         "title": 'Федеральный закон 63-ФЗ «Об электронной подписи»',
         "type": "federal_law",
         "domain": "electronic_signature",
     },
     "98fz_commercial_secret": {
-        "url": "https://www.consultant.ru/document/cons_doc_LAW_46388/",
+        "url": "https://pravo.gov.ru/prod/otspage?law=98-FZ",
         "title": 'Федеральный закон 98-ФЗ «О коммерческой тайне»',
         "type": "federal_law",
         "domain": "commercial_secret",
     },
     "187fz_kii": {
-        "url": "https://www.consultant.ru/document/cons_doc_LAW_236691/",
+        "url": "https://pravo.gov.ru/prod/otspage?law=187-FZ",
         "title": 'Федеральный закон 187-ФЗ «О безопасности критической информационной инфраструктуры Российской Федерации»',
         "type": "federal_law",
         "domain": "critical_infrastructure",
     },
     "pp1119_personal_data_security": {
-        "url": "https://www.consultant.ru/document/cons_doc_LAW_92990/",
+        "url": "https://pravo.gov.ru/prod/otspage?law=1119-PP",
         "title": "Постановление Правительства РФ №1119 «О требованиях к защите персональных данных при их обработке в информационных системах персональных данных»",
         "type": "government_decree",
         "domain": "personal_data_security",
     },
     "fstec21_personal_data_controls": {
-        "url": "https://www.consultant.ru/document/cons_doc_LAW_109492/",
+        "url": "https://pravo.gov.ru/prod/otspage?law=21-FSTEK",
         "title": "Приказ ФСТЭК России №21 «Об утверждении Состава и содержания организационных и технических мер по обеспечению безопасности персональных данных при их обработке в информационных системах персональных данных»",
         "type": "fstec_order",
         "domain": "personal_data_controls",
     },
     "fsb378_crypto_personal_data": {
-        "url": "https://www.consultant.ru/document/cons_doc_LAW_86985/",
+        "url": "https://pravo.gov.ru/prod/otspage?law=378-FSB",
         "title": "Приказ ФСБ России №378 «Об утверждении Требований к форме квалифицированного сертификата электронной подписи»",
         "type": "fsb_order",
         "domain": "crypto_personal_data",
@@ -86,17 +86,25 @@ HEADERS = {
 
 
 def fetch_html(url: str) -> str:
-    """Fetch HTML from consultant.ru."""
+    """Fetch HTML from pravo.gov.ru."""
     with httpx.Client(follow_redirects=True, timeout=30) as client:
         response = client.get(url, headers=HEADERS)
         response.raise_for_status()
         return response.text
 
 
+def extract_document_url(html: str) -> str | None:
+    """Extract the first document URL from a listing page."""
+    soup = BeautifulSoup(html, "html.parser")
+    link = soup.find("a", href=re.compile(r"/Document/"))
+    if link and link.get("href"):
+        return "https://pravo.gov.ru" + link["href"]
+    return None
+
+
 def extract_version_date(html: str) -> str:
     """Extract the last revision date from the HTML."""
     soup = BeautifulSoup(html, "html.parser")
-    # Look for "последняя редакция" or date patterns
     date_pattern = re.compile(
         r"(\d{2}\.\d{2}\.\d{4}|\d{1,2}\s+(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+\d{4})"
     )
@@ -162,6 +170,11 @@ def fetch_law(key: str, force: bool = False) -> None:
 
     try:
         html = fetch_html(url)
+        # Check if it's a listing page
+        doc_url = extract_document_url(html)
+        if doc_url:
+            logger.info("Found document URL: %s", doc_url)
+            html = fetch_html(doc_url)
     except Exception as e:
         logger.error("Failed to fetch %s: %s", key, e)
         return
@@ -196,8 +209,8 @@ def fetch_law(key: str, force: bool = False) -> None:
         f'document_title: "{law["title"]}"\n'
         f'document_type: "{law["type"]}"\n'
         f'domain: "{law["domain"]}"\n'
-        'source: "consultant.ru"\n'
-        f'source_url: "{url}"\n'
+        'source: "pravo.gov.ru"\n'
+        f'source_url: "{doc_url or url}"\n'
         f'version_date: "{version_date}"\n'
         f'fetched_at: "{date.today().isoformat()}"\n'
         f'checksum: "{checksum}"\n'

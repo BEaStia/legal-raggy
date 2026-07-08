@@ -36,8 +36,7 @@ GOLDEN_DATASET: list[GoldenCase] = [
     GoldenCase(
         id="case_02",
         description=(
-            "Публичный сайт с Google Analytics и формой обратной связи. "
-            "Собираем email и имя."
+            "Публичный сайт с Google Analytics и формой обратной связи. Собираем email и имя."
         ),
         expected_architecture_type="public_website",
         expected_data_categories=["personal_data"],
@@ -61,10 +60,7 @@ GOLDEN_DATASET: list[GoldenCase] = [
     # 4. Payment service
     GoldenCase(
         id="case_04",
-        description=(
-            "Сервис оплаты подписки через платежный провайдер. "
-            "Храним статусы платежей."
-        ),
+        description=("Сервис оплаты подписки через платежный провайдер. Храним статусы платежей."),
         expected_architecture_type="payment_service",
         expected_data_categories=["payment_data"],
         expected_triggers=["payment_regulation_possible"],
@@ -75,9 +71,7 @@ GOLDEN_DATASET: list[GoldenCase] = [
     # 5. EDO service with electronic signature
     GoldenCase(
         id="case_05",
-        description=(
-            "Сервис ЭДО с УКЭП для юридически значимых документов."
-        ),
+        description=("Сервис ЭДО с УКЭП для юридически значимых документов."),
         expected_architecture_type="edo_signature_service",
         expected_data_categories=["documents"],
         expected_triggers=["electronic_signature_regulation"],
@@ -101,10 +95,7 @@ GOLDEN_DATASET: list[GoldenCase] = [
     # 7. Integration API
     GoldenCase(
         id="case_07",
-        description=(
-            "API интеграция с CRM и email provider. "
-            "Передаём email и имя клиентов."
-        ),
+        description=("API интеграция с CRM и email provider. Передаём email и имя клиентов."),
         expected_architecture_type="integration_api",
         expected_data_categories=["personal_data"],
         expected_triggers=["personal_data_processing"],
@@ -114,9 +105,7 @@ GOLDEN_DATASET: list[GoldenCase] = [
     # 8. KII subject service
     GoldenCase(
         id="case_08",
-        description=(
-            "Сервис для банка. Является частью КИИ субъекта."
-        ),
+        description=("Сервис для банка. Является частью КИИ субъекта."),
         expected_architecture_type="unknown",
         expected_data_categories=[],
         expected_triggers=["kii_relevance_possible"],
@@ -126,9 +115,7 @@ GOLDEN_DATASET: list[GoldenCase] = [
     # 9. Observability stack
     GoldenCase(
         id="case_09",
-        description=(
-            "Логи уходят в Sentry и Grafana. Там может быть email."
-        ),
+        description=("Логи уходят в Sentry и Grafana. Там может быть email."),
         expected_architecture_type="unknown",
         expected_data_categories=["personal_data", "telemetry_logs"],
         expected_triggers=["personal_data_processing"],
@@ -161,10 +148,7 @@ GOLDEN_DATASET: list[GoldenCase] = [
     # 12. Mobile backend
     GoldenCase(
         id="case_12",
-        description=(
-            "Mobile backend для iOS/Android. "
-            "Пользователи регистрируются по email."
-        ),
+        description=("Mobile backend для iOS/Android. Пользователи регистрируются по email."),
         expected_architecture_type="mobile_backend",
         expected_data_categories=["personal_data"],
         expected_triggers=["personal_data_processing"],
@@ -174,9 +158,7 @@ GOLDEN_DATASET: list[GoldenCase] = [
     # 13. DWH/BI with commercial data
     GoldenCase(
         id="case_13",
-        description=(
-            "DWH для хранения business reports и internal analytics."
-        ),
+        description=("DWH для хранения business reports и internal analytics."),
         expected_architecture_type="dwh_bi",
         expected_data_categories=["commercial_secret"],
         expected_triggers=["commercial_secret_possible"],
@@ -186,10 +168,7 @@ GOLDEN_DATASET: list[GoldenCase] = [
     # 14. Public SaaS with MFA
     GoldenCase(
         id="case_14",
-        description=(
-            "Public SaaS с MFA для админки. "
-            "Регистрация по email. База в РФ."
-        ),
+        description=("Public SaaS с MFA для админки. Регистрация по email. База в РФ."),
         expected_architecture_type="public_saas",
         expected_data_categories=["personal_data"],
         expected_triggers=["personal_data_processing"],
@@ -199,9 +178,7 @@ GOLDEN_DATASET: list[GoldenCase] = [
     # 15. Government service
     GoldenCase(
         id="case_15",
-        description=(
-            "Сервис для госоргана. Интеграция с government system."
-        ),
+        description=("Сервис для госоргана. Интеграция с government system."),
         expected_architecture_type="unknown",
         expected_data_categories=[],
         expected_triggers=[],
@@ -221,9 +198,7 @@ GOLDEN_DATASET: list[GoldenCase] = [
     # 17. Payment with personal data
     GoldenCase(
         id="case_17",
-        description=(
-            "Платежный сервис с хранением email и имени плательщика."
-        ),
+        description=("Платежный сервис с хранением email и имени плательщика."),
         expected_architecture_type="payment_service",
         expected_data_categories=["personal_data", "payment_data"],
         expected_triggers=["personal_data_processing", "payment_regulation_possible"],
@@ -245,8 +220,7 @@ GOLDEN_DATASET: list[GoldenCase] = [
     GoldenCase(
         id="case_19",
         description=(
-            "API интеграция с observability service. "
-            "Передаём логи без персональных данных."
+            "API интеграция с observability service. Передаём логи без персональных данных."
         ),
         expected_architecture_type="integration_api",
         expected_data_categories=["telemetry_logs"],

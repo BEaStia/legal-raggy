@@ -40,6 +40,18 @@ def create_collection(client: QdrantClient, collection_name: str | None = None) 
     )
 
 
+def collection_has_points(
+    client: QdrantClient,
+    collection_name: str | None = None,
+) -> bool:
+    """Check if collection already has indexed points."""
+    name = collection_name or settings.QDRANT_COLLECTION
+    if not client.collection_exists(name):
+        return False
+    info = client.get_collection(name)
+    return info.points_count > 0
+
+
 def index_chunks(
     client: QdrantClient,
     chunks: list[DocumentChunk],
@@ -47,13 +59,15 @@ def index_chunks(
 ) -> int:
     """Index document chunks into Qdrant.
 
+    Skips indexing if collection already has points (idempotent on first run).
+
     Args:
         client: QdrantClient instance.
         chunks: List of DocumentChunk objects to index.
         collection_name: Collection name (defaults to config).
 
     Returns:
-        Number of chunks indexed.
+        Number of chunks indexed (0 if already indexed).
     """
     from app.core.embeddings import embed_texts
 
@@ -62,6 +76,9 @@ def index_chunks(
 
     name = collection_name or settings.QDRANT_COLLECTION
     create_collection(client, name)
+
+    if collection_has_points(client, name):
+        return 0
 
     texts = [c.text for c in chunks]
     vectors = embed_texts(texts)

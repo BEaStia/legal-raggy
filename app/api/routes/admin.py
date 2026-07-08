@@ -11,6 +11,8 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader
 
+from app.core.md_converter import md_to_html
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -18,7 +20,7 @@ router = APIRouter()
 TEMPLATES_DIR = Path(__file__).parent.parent.parent / "templates"
 env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
 
-LAWS_DIR = Path("data/raw/laws")
+LAWS_DIR = Path(__file__).parent.parent.parent.parent / "data" / "raw" / "laws"
 ARCHIVE_DIR = LAWS_DIR / "archive"
 
 
@@ -43,14 +45,17 @@ def _get_laws_info() -> list[dict]:
     for md_file in sorted(LAWS_DIR.glob("*.md")):
         meta = _parse_frontmatter(md_file)
         if meta:
-            laws.append({
-                "title": meta.get("document_title", md_file.stem),
-                "version_date": meta.get("version_date", "Unknown"),
-                "fetched_at": meta.get("fetched_at", "Unknown"),
-                "source": meta.get("source", "local"),
-                "source_url": meta.get("source_url", "#"),
-                "checksum": meta.get("checksum", "N/A"),
-            })
+            laws.append(
+                {
+                    "filename": md_file.name,
+                    "title": meta.get("document_title", md_file.stem),
+                    "version_date": meta.get("version_date", "Unknown"),
+                    "fetched_at": meta.get("fetched_at", "Unknown"),
+                    "source": meta.get("source", "local"),
+                    "source_url": meta.get("source_url", "#"),
+                    "checksum": meta.get("checksum", "N/A"),
+                }
+            )
     return laws
 
 
@@ -88,6 +93,33 @@ async def admin_dashboard(request: Request):
             archive_count=_get_archive_count(),
             last_update=_get_last_update(),
             logs=[],
+        )
+    )
+
+
+@router.get("/admin/law/{filename}", response_class=HTMLResponse)
+async def view_law(request: Request, filename: str):
+    """View the content of a specific law."""
+    filepath = LAWS_DIR / filename
+    if not filepath.exists():
+        return HTMLResponse("<h1>Law not found</h1>", status_code=404)
+
+    meta = _parse_frontmatter(filepath)
+    content = filepath.read_text(encoding="utf-8")
+
+    # Remove frontmatter from display
+    match = re.match(r"^---\s*\n(.*?)\n---\s*\n(.*)", content, re.DOTALL)
+    body = match.group(2) if match else content
+
+    html_content = md_to_html(body)
+
+    template = env.get_template("law_view.html")
+    return HTMLResponse(
+        template.render(
+            request=request,
+            title=meta.get("document_title", filename),
+            version=meta.get("version_date", "Unknown"),
+            html_content=html_content,
         )
     )
 
