@@ -8,14 +8,13 @@ from collections.abc import Callable
 from pathlib import Path
 
 from app.agents.state import ComplianceState
+from app.core.config import LAWS_DIR
 from app.models import ComplianceAssessment
 from app.rules.engine import analyze_profile
 from app.rules.llm_extractor import extract_with_llm
 from app.services.citations import attach_citation
 
 logger = logging.getLogger(__name__)
-
-_DEFAULT_LAWS_DIR = Path(__file__).parent.parent.parent / "data" / "raw" / "laws"
 
 
 def extract_profile_node(
@@ -71,7 +70,7 @@ def retrieve_legal_basis_node(
     if not triggers:
         return {"citations": [], "errors": []}
 
-    laws = laws_dir or _DEFAULT_LAWS_DIR
+    laws = laws_dir or LAWS_DIR
     profile = state.get("architecture_profile")
     if profile is None:
         return {"citations": [], "errors": []}

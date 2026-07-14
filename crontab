@@ -1,0 +1,2 @@
+# Auto-update laws corpus daily at 3:00 AM
+0 3 * * * cd /app && python scripts/update_laws_cron.py >> /app/data/logs/cron.log 2>&1

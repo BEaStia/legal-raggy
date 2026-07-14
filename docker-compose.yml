@@ -7,11 +7,13 @@ services:
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
       - EMBEDDING_PROVIDER=e5
+    volumes:
+      - laws_data:/app/data/raw/laws
     depends_on:
       qdrant:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -31,5 +33,22 @@ services:
       retries: 3
       start_period: 10s
 
+  laws-updater:
+    build: .
+    command: python scripts/update_laws_cron.py
+    environment:
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+    volumes:
+      - laws_data:/app/data/raw/laws
+      - ./data/logs:/app/data/logs
+    depends_on:
+      qdrant:
+        condition: service_healthy
+    restart: "no"
+    profiles:
+      - cron
+
 volumes:
   qdrant_data:
+  laws_data:

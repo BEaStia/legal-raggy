@@ -1,6 +1,10 @@
 """Application configuration."""
 
 import os
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+LAWS_DIR = PROJECT_ROOT / "data" / "raw" / "laws"
 
 
 class Settings:

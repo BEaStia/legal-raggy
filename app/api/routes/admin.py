@@ -3,6 +3,7 @@
 import io
 import logging
 import re
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -11,6 +12,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader
 
+from app.core.config import LAWS_DIR
 from app.core.md_converter import md_to_html
 
 logger = logging.getLogger(__name__)
@@ -20,8 +22,11 @@ router = APIRouter()
 TEMPLATES_DIR = Path(__file__).parent.parent.parent / "templates"
 env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
 
-LAWS_DIR = Path(__file__).parent.parent.parent.parent / "data" / "raw" / "laws"
 ARCHIVE_DIR = LAWS_DIR / "archive"
+
+# Simple TTL cache for laws info
+_laws_info_cache: dict = {"data": None, "expires_at": 0.0}
+_LAWS_INFO_TTL = 60  # seconds
 
 
 def _parse_frontmatter(filepath: Path) -> dict:
@@ -37,7 +42,11 @@ def _parse_frontmatter(filepath: Path) -> dict:
 
 
 def _get_laws_info() -> list[dict]:
-    """Get info about all laws in the corpus."""
+    """Get info about all laws in the corpus (cached for 60s)."""
+    now = time.monotonic()
+    if now < _laws_info_cache["expires_at"] and _laws_info_cache["data"] is not None:
+        return _laws_info_cache["data"]
+
     laws: list[dict] = []
     if not LAWS_DIR.exists():
         return laws
@@ -56,6 +65,9 @@ def _get_laws_info() -> list[dict]:
                     "checksum": meta.get("checksum", "N/A"),
                 }
             )
+
+    _laws_info_cache["data"] = laws
+    _laws_info_cache["expires_at"] = now + _LAWS_INFO_TTL
     return laws
 
 

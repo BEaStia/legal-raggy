@@ -1,24 +1,18 @@
 """Search API routes."""
 
-from pathlib import Path
 from typing import Literal
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from app.core.config import settings
+from app.core.config import LAWS_DIR, settings
 from app.ingestion.chunking import load_corpus
 from app.retrieval.dense import DenseRetriever
 from app.retrieval.hybrid import HybridRetriever
 from app.retrieval.keyword import KeywordRetriever
-from app.retrieval.qdrant_store import (
-    create_collection,
-    index_chunks,
-)
+from app.retrieval.qdrant_store import create_collection, index_chunks
 
 router = APIRouter()
-
-LAWS_DIR = Path(__file__).parent.parent.parent.parent / "data" / "raw" / "laws"
 
 
 class SearchRequest(BaseModel):
@@ -43,8 +37,11 @@ class SearchResponse(BaseModel):
     results: list[SearchResult]
 
 
-def _get_keyword_retriever() -> KeywordRetriever:
-    """Get keyword retriever with loaded corpus."""
+def _get_keyword_retriever(state) -> KeywordRetriever:
+    """Get keyword retriever from app state or create on demand."""
+    if hasattr(state, "keyword_retriever") and state.keyword_retriever is not None:
+        return state.keyword_retriever
+
     retriever = KeywordRetriever()
     if LAWS_DIR.exists():
         chunks = load_corpus(LAWS_DIR)
@@ -52,61 +49,64 @@ def _get_keyword_retriever() -> KeywordRetriever:
     return retriever
 
 
-def _get_dense_retriever() -> DenseRetriever | None:
-    """Get dense retriever if Qdrant is available."""
+def _get_dense_retriever(state) -> DenseRetriever | None:
+    """Get dense retriever from app state or create on demand."""
+    if hasattr(state, "dense_retriever") and state.dense_retriever is not None:
+        return state.dense_retriever
+
     from qdrant_client import QdrantClient
 
     try:
         client = QdrantClient(url=settings.qdrant_url, timeout=5)
         client.get_collections()
 
-        # Index corpus only if collection is empty
         if LAWS_DIR.exists():
             chunks = load_corpus(LAWS_DIR)
             if chunks:
                 create_collection(client, settings.QDRANT_COLLECTION)
                 index_chunks(client, chunks, settings.QDRANT_COLLECTION)
-
-        return DenseRetriever(client, settings.QDRANT_COLLECTION)
+                return DenseRetriever(client, settings.QDRANT_COLLECTION)
     except Exception:
-        return None
+        pass
+    return None
 
 
 @router.post("/search", response_model=SearchResponse)
-async def search_corpus(request: SearchRequest):
+async def search_corpus(request: Request, body: SearchRequest):
     """Search the legal corpus using keyword, dense, or hybrid retrieval."""
-    results: list = []
+    state = request.app.state
+    results = []
 
-    if request.mode == "keyword":
-        retriever = _get_keyword_retriever()
-        results = retriever.search(request.query, top_k=request.top_k)
+    if body.mode == "keyword":
+        retriever = _get_keyword_retriever(state)
+        results = retriever.search(body.query, top_k=body.top_k)
 
-    elif request.mode == "dense":
-        dense_retriever = _get_dense_retriever()
+    elif body.mode == "dense":
+        dense_retriever = _get_dense_retriever(state)
         if dense_retriever is None:
             raise HTTPException(
                 status_code=503,
                 detail="Dense retrieval unavailable: Qdrant not connected",
             )
-        results = dense_retriever.search(request.query, top_k=request.top_k)
+        results = dense_retriever.search(body.query, top_k=body.top_k)
 
-    elif request.mode == "hybrid":
-        kw_retriever = _get_keyword_retriever()
-        dense_retriever = _get_dense_retriever()
+    elif body.mode == "hybrid":
+        kw_retriever = _get_keyword_retriever(state)
+        dense_retriever = _get_dense_retriever(state)
 
         if dense_retriever is None:
             # Fallback to keyword if Qdrant unavailable
-            results = kw_retriever.search(request.query, top_k=request.top_k)
+            results = kw_retriever.search(body.query, top_k=body.top_k)
         else:
             hybrid = HybridRetriever(kw_retriever, dense_retriever)
-            results = hybrid.search(request.query, top_k=request.top_k)
+            results = hybrid.search(body.query, top_k=body.top_k)
 
     else:
-        raise HTTPException(status_code=400, detail=f"Unknown mode: {request.mode}")
+        raise HTTPException(status_code=400, detail=f"Unknown mode: {body.mode}")
 
     return SearchResponse(
-        query=request.query,
-        mode=request.mode,
+        query=body.query,
+        mode=body.mode,
         total_results=len(results),
         results=[
             SearchResult(
