@@ -49,7 +49,7 @@ def collection_has_points(
     if not client.collection_exists(name):
         return False
     info = client.get_collection(name)
-    return info.points_count > 0
+    return (info.points_count or 0) > 0
 
 
 def index_chunks(

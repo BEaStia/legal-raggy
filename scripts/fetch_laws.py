@@ -6,12 +6,12 @@ Usage:
 """
 
 import hashlib
-import json
 import logging
 import re
 import sys
 from datetime import date
 from pathlib import Path
+from typing import Literal, NotRequired, TypedDict
 
 import httpx
 from bs4 import BeautifulSoup
@@ -22,53 +22,82 @@ logger = logging.getLogger(__name__)
 LAWS_DIR = Path(__file__).parent.parent / "data" / "raw" / "laws"
 ARCHIVE_DIR = LAWS_DIR / "archive"
 
+
+class LawFetchResult(TypedDict):
+    key: str
+    status: Literal["changed", "skipped", "failed"]
+    changed: bool
+    version_date: NotRequired[str]
+    checksum: NotRequired[str]
+    archive_path: NotRequired[str]
+    error: NotRequired[str]
+
+
 # Document IDs on pravo.gov.ru
 LAW_IDS = {
     "152fz_personal_data": {
         "url": "http://pravo.gov.ru/proxy/ips/?docbody&nd=102108261",
-        "title": 'Федеральный закон 152-ФЗ «О персональных данных»',
+        "title": "Федеральный закон 152-ФЗ «О персональных данных»",
         "type": "federal_law",
         "domain": "personal_data",
     },
     "149fz_information": {
         "url": "https://pravo.gov.ru/prod/otspage?law=149-FZ",
-        "title": 'Федеральный закон 149-ФЗ «Об информации, информационных технологиях и о защите информации»',
+        "title": (
+            "Федеральный закон 149-ФЗ «Об информации, информационных технологиях "
+            "и о защите информации»"
+        ),
         "type": "federal_law",
         "domain": "information_technology",
     },
     "63fz_electronic_signature": {
         "url": "https://pravo.gov.ru/prod/otspage?law=63-FZ",
-        "title": 'Федеральный закон 63-ФЗ «Об электронной подписи»',
+        "title": "Федеральный закон 63-ФЗ «Об электронной подписи»",
         "type": "federal_law",
         "domain": "electronic_signature",
     },
     "98fz_commercial_secret": {
         "url": "https://pravo.gov.ru/prod/otspage?law=98-FZ",
-        "title": 'Федеральный закон 98-ФЗ «О коммерческой тайне»',
+        "title": "Федеральный закон 98-ФЗ «О коммерческой тайне»",
         "type": "federal_law",
         "domain": "commercial_secret",
     },
     "187fz_kii": {
         "url": "https://pravo.gov.ru/prod/otspage?law=187-FZ",
-        "title": 'Федеральный закон 187-ФЗ «О безопасности критической информационной инфраструктуры Российской Федерации»',
+        "title": (
+            "Федеральный закон 187-ФЗ «О безопасности критической информационной "
+            "инфраструктуры Российской Федерации»"
+        ),
         "type": "federal_law",
         "domain": "critical_infrastructure",
     },
     "pp1119_personal_data_security": {
         "url": "https://pravo.gov.ru/prod/otspage?law=1119-PP",
-        "title": "Постановление Правительства РФ №1119 «О требованиях к защите персональных данных при их обработке в информационных системах персональных данных»",
+        "title": (
+            "Постановление Правительства РФ №1119 «О требованиях к защите "
+            "персональных данных при их обработке в информационных системах "
+            "персональных данных»"
+        ),
         "type": "government_decree",
         "domain": "personal_data_security",
     },
     "fstec21_personal_data_controls": {
         "url": "https://pravo.gov.ru/prod/otspage?law=21-FSTEK",
-        "title": "Приказ ФСТЭК России №21 «Об утверждении Состава и содержания организационных и технических мер по обеспечению безопасности персональных данных при их обработке в информационных системах персональных данных»",
+        "title": (
+            "Приказ ФСТЭК России №21 «Об утверждении Состава и содержания "
+            "организационных и технических мер по обеспечению безопасности "
+            "персональных данных при их обработке в информационных системах "
+            "персональных данных»"
+        ),
         "type": "fstec_order",
         "domain": "personal_data_controls",
     },
     "fsb378_crypto_personal_data": {
         "url": "https://pravo.gov.ru/prod/otspage?law=378-FSB",
-        "title": "Приказ ФСБ России №378 «Об утверждении Требований к форме квалифицированного сертификата электронной подписи»",
+        "title": (
+            "Приказ ФСБ России №378 «Об утверждении Требований к форме "
+            "квалифицированного сертификата электронной подписи»"
+        ),
         "type": "fsb_order",
         "domain": "crypto_personal_data",
     },
@@ -105,9 +134,10 @@ def extract_document_url(html: str) -> str | None:
 def extract_version_date(html: str) -> str:
     """Extract the last revision date from the HTML."""
     soup = BeautifulSoup(html, "html.parser")
-    date_pattern = re.compile(
-        r"(\d{2}\.\d{2}\.\d{4}|\d{1,2}\s+(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+\d{4})"
+    month_names = (
+        "января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря"
     )
+    date_pattern = re.compile(rf"(\d{{2}}\.\d{{2}}\.\d{{4}}|\d{{1,2}}\s+({month_names})\s+\d{{4}})")
     text = soup.get_text()
     matches = date_pattern.findall(text)
     if matches:
@@ -159,7 +189,16 @@ def compute_checksum(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
 
 
-def fetch_law(key: str, force: bool = False) -> None:
+def _read_stored_checksum(filepath: Path) -> str | None:
+    """Read a stored body checksum from Markdown frontmatter."""
+    existing = filepath.read_text(encoding="utf-8")
+    match = re.search(r'^checksum:\s*"?([^"\n]+)"?\s*$', existing, flags=re.MULTILINE)
+    if match:
+        return match.group(1)
+    return None
+
+
+def fetch_law(key: str, force: bool = False) -> LawFetchResult:
     """Fetch a single law and save as Markdown."""
     law = LAW_IDS[key]
     url = law["url"]
@@ -177,26 +216,38 @@ def fetch_law(key: str, force: bool = False) -> None:
             html = fetch_html(doc_url)
     except Exception as e:
         logger.error("Failed to fetch %s: %s", key, e)
-        return
+        return {"key": key, "status": "failed", "changed": False, "error": str(e)}
 
     version_date = extract_version_date(html)
     body = extract_body_text(html)
 
     if not body:
         logger.warning("No body text extracted for %s", key)
-        return
+        return {
+            "key": key,
+            "status": "failed",
+            "changed": False,
+            "version_date": version_date,
+            "error": "no body text extracted",
+        }
 
     checksum = compute_checksum(body)
 
     # Check if existing file has same checksum
     if filepath.exists() and not force:
-        existing = filepath.read_text(encoding="utf-8")
-        existing_checksum = compute_checksum(existing)
+        existing_checksum = _read_stored_checksum(filepath)
         if existing_checksum == checksum:
             logger.info("No changes for %s, skipping", key)
-            return
+            return {
+                "key": key,
+                "status": "skipped",
+                "changed": False,
+                "version_date": version_date,
+                "checksum": checksum,
+            }
 
     # Archive old version if exists
+    archive_path = None
     if filepath.exists():
         ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
         archive_path = ARCHIVE_DIR / f"{key}_{version_date}.md"
@@ -219,27 +270,41 @@ def fetch_law(key: str, force: bool = False) -> None:
 
     filepath.write_text(frontmatter + body, encoding="utf-8")
     logger.info("Saved %s (version: %s, checksum: %s)", filename, version_date, checksum)
+    result: LawFetchResult = {
+        "key": key,
+        "status": "changed",
+        "changed": True,
+        "version_date": version_date,
+        "checksum": checksum,
+    }
+    if archive_path is not None:
+        result["archive_path"] = str(archive_path)
+    return result
 
 
 def main() -> None:
     """Fetch all configured laws or specific ones."""
     LAWS_DIR.mkdir(parents=True, exist_ok=True)
+    force = "--force" in sys.argv
+    args = [a for a in sys.argv[1:] if a != "--force"]
 
-    if len(sys.argv) > 1:
-        keys = [a for a in sys.argv[1:] if a in LAW_IDS]
+    if args:
+        keys = [a for a in args if a in LAW_IDS]
         if not keys:
-            logger.error("Unknown law keys: %s", sys.argv[1:])
+            logger.error("Unknown law keys: %s", args)
             logger.info("Available: %s", list(LAW_IDS.keys()))
             sys.exit(1)
     else:
         keys = list(LAW_IDS.keys())
 
-    force = "--force" in sys.argv
-
+    results = []
     for key in keys:
-        fetch_law(key, force=force)
+        results.append(fetch_law(key, force=force))
 
-    logger.info("Done. Fetched %d laws.", len(keys))
+    failed = sum(1 for result in results if result["status"] == "failed")
+    logger.info("Done. Processed %d laws, %d failed.", len(keys), failed)
+    if failed:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
