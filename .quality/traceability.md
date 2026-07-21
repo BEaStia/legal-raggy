@@ -10,3 +10,13 @@
 | Markdown report | Brief 14, 15.4, 16.6 | TASK-0006 | `tests/test_renderer.py` | ADR-0002 | REVIEW-0006 | `.articles/0006-markdown-renderer.md` |
 | Local retrieval | Brief 11–13, 16.7 | TASK-0007 | `tests/test_retrieval.py` | ADR-0002 | REVIEW-0007 | `.articles/0007-local-corpus-loader.md` |
 | Grounded citations | Brief 16.8 | TASK-0008 | `tests/test_citations.py` | ADR-0002 | REVIEW-0008 | `.articles/0008-assessment-citations.md` |
+
+# Матрица трассировки Milestone 2
+
+| Requirement | Source | Task | Verification | ADR | Review | Article |
+|---|---|---|---|---|---|---|
+| Qdrant + dense retrieval | Brief 19 | TASK-0009 | `tests/test_dense_retrieval.py` | ADR-0002 | REVIEW-0004 | `.articles/0009-qdrant-embeddings.md` |
+| Hybrid retrieval | Milestone 2 plan | TASK-0010 | `tests/test_hybrid_retrieval.py` | ADR-0002 | REVIEW-0004 | `.articles/0010-hybrid-retrieval.md` |
+| Hybrid citations | Milestone 2 plan | TASK-0011, TASK-0019 | `tests/test_hybrid_citations.py`, `tests/test_hybrid_citations_production.py` | ADR-0002 | REVIEW-0004 | `.articles/0011-hybrid-citations.md`, `.articles/0019-hybrid-citations.md` |
+| Evaluation framework | Milestone 2 plan | TASK-0016 | `app.evaluation.metrics.run_evaluation()` | ADR-0002 | REVIEW-0004 | `.articles/0016-evaluation.md` |
+| Real corpus and freshness | Milestone 2 plan | TASK-0017, TASK-0018 | `tests/test_laws_update_cron.py`, Docker smoke-check pending | ADR-0002 | REVIEW-0004 | `.articles/0017-real-laws-fetcher.md`, `.articles/0018-auto-update-laws.md` |
