@@ -19,9 +19,11 @@
 - **TASK-0017**: Real laws fetcher — `scripts/fetch_laws.py` downloads 8 laws from consultant.ru with version tracking.
 - **TASK-0018**: Auto-update laws via cron — structured update status, weekly cron entry, JSON logs, `--check` smoke mode, task article and lightweight Docker `laws-updater` target are implemented.
 - **TASK-0019**: Hybrid citations in production — hybrid retrieval integrated with fallback to keyword, 6 comparison tests.
+- **TASK-0020**: Search endpoint release closure — `POST /api/v1/search` task/article/review/traceability are synchronized; 6 focused API tests cover keyword, hybrid fallback, dense unavailable, result shape and validation.
 - **REVIEW-0002**: passed; замечаний нет.
 - **REVIEW-0003**: passed; замечаний нет.
 - **REVIEW-0004**: Milestone 2 flow review — passed; functional RAG flow is coherent and TASK-0018 container smoke-check passed.
+- **REVIEW-0005**: Search endpoint review — passed; no P0/P1 issues.
 
 ## Verification
 
@@ -33,6 +35,8 @@
 - `docker build --target laws-updater -t legal-raggy-laws-updater:task-0018 .` — passed.
 - `docker run --rm legal-raggy-laws-updater:task-0018 python scripts/update_laws_cron.py --check` — passed.
 - `docker compose build laws-updater` — passed.
+- `python -m pytest tests/test_search_api.py -q` — 6 passed.
+- `ruff check app/api/routes/search.py tests/test_search_api.py` — passed.
 
 ## Constraints and blockers
 
@@ -43,4 +47,4 @@
 
 ## Exact next action
 
-Create the next explicit milestone task. Candidate: Milestone 3 structured LLM extraction quality hardening, or external notification delivery for law update events.
+Create the next explicit runtime task. Candidate: LLM extraction quality hardening on golden cases, or external notification delivery for law update events.
