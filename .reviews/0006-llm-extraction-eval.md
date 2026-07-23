@@ -1,7 +1,7 @@
 ---
 id: REVIEW-0006
 task: TASK-0021
-reviewed_commit: ff24898a7e507572378a3b9f4a55d5e21942aa8e
+reviewed_commit: d73bf50c5672d9bb5e7a27eb39b214ff0a90ef7c
 reviewer: implementation-agent
 status: passed
 created_at: 2026-07-21
