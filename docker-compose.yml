@@ -1,6 +1,8 @@
 services:
   api:
-    build: .
+    build:
+      context: .
+      target: api
     ports:
       - "8000:8000"
     environment:
@@ -34,7 +36,9 @@ services:
       start_period: 10s
 
   laws-updater:
-    build: .
+    build:
+      context: .
+      target: laws-updater
     command: python scripts/update_laws_cron.py
     environment:
       - QDRANT_HOST=qdrant

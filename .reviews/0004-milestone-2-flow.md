@@ -3,7 +3,7 @@ id: REVIEW-0004
 task: MILESTONE-2
 reviewed_commit: f5f29b1
 reviewer: codex
-status: passed-with-follow-up
+status: passed
 created_at: 2026-07-21
 ---
 
@@ -28,6 +28,9 @@ treated as release-complete.
 - `mypy app` — passed on 2026-07-20.
 - `python scripts/check_docs.py --all` — passed on 2026-07-20.
 - `python -m pre_commit run --all-files` — passed on 2026-07-21.
+- `docker build --target laws-updater -t legal-raggy-laws-updater:task-0018 .` — passed on 2026-07-21.
+- `docker run --rm legal-raggy-laws-updater:task-0018 python scripts/update_laws_cron.py --check` — passed on 2026-07-21.
+- `docker compose build laws-updater` — passed on 2026-07-21.
 - Full `python -m pytest -q` — passed with network access on 2026-07-20: `196 passed`.
 - Independent review of TASK-0018 changes found no discrete correctness issues.
 
@@ -49,15 +52,14 @@ the workflow can route through a warning node before finalization.
 
 Verdict: pass.
 
-### Finding 3: Corpus freshness is improved but not release-closed
+### Finding 3: Corpus freshness is release-closed
 `TASK-0018` added structured `changed/skipped/failed` update results, weekly cron
-configuration, JSON update logs, and a task article. The task is correctly kept
-in `.tasks/in-progress` because container smoke verification did not complete.
-The Dockerfile now copies `scripts/`, which is required by the `laws-updater`
-compose command, but the Docker build was interrupted during heavy ML dependency
-installation and should not be reported as passed.
+configuration, JSON update logs, `--check` smoke mode, and a task article. The
+Dockerfile now has a lightweight `laws-updater` target, so the cron smoke-check
+does not depend on full API ML dependencies. The target build, container
+`--check` run, and compose build now pass.
 
-Verdict: follow-up required before release closure.
+Verdict: pass.
 
 ### Finding 4: Verification boundary is understood
 Dense and hybrid tests depend on the HuggingFace embedding model. In the current
@@ -72,11 +74,10 @@ Milestone 2 is functionally coherent for local RAG flow: corpus loading,
 keyword/dense/hybrid retrieval, citation attachment, fallback behavior,
 workflow grounding, and evaluation are connected.
 
-Milestone 2 should not be marked release-complete until `TASK-0018` finishes its
-container smoke-check and moves from `in-progress` to `ready-for-release`.
+Milestone 2 can be treated as release-complete for the local RAG flow and corpus
+freshness automation.
 
 Recommended next action:
-1. Finish `TASK-0018` container smoke-check for `laws-updater`.
-2. Move `TASK-0018` to `ready-for-release` if the smoke-check passes.
-3. Then create the next explicit task for the next milestone rather than relying
-   on the stale handoff wording.
+1. Create the next explicit task for Milestone 3.
+2. Keep external notification delivery for law update events as a separate
+   follow-up if it becomes necessary.

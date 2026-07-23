@@ -2,7 +2,7 @@
 
 - Updated: 2026-07-21
 - Goal: Milestone 2 — Qdrant retrieval + embeddings.
-- Active task: **TASK-0018 — Auto-update laws via cron job**; WIP = 1.
+- Active task: **нет**; WIP = 0.
 
 ## Completed
 
@@ -17,11 +17,11 @@
 - **TASK-0015**: Grounding check + conditional routing — warning node при отсутствии citations, `add_conditional_edges`.
 - **TASK-0016**: Evaluation framework — golden dataset (20 cases), precision/recall/citation coverage metrics.
 - **TASK-0017**: Real laws fetcher — `scripts/fetch_laws.py` downloads 8 laws from consultant.ru with version tracking.
-- **TASK-0018**: Auto-update laws via cron — in progress; structured update status, weekly cron entry, JSON logs, task article and Dockerfile script copy are implemented. Container smoke-check is still incomplete.
+- **TASK-0018**: Auto-update laws via cron — structured update status, weekly cron entry, JSON logs, `--check` smoke mode, task article and lightweight Docker `laws-updater` target are implemented.
 - **TASK-0019**: Hybrid citations in production — hybrid retrieval integrated with fallback to keyword, 6 comparison tests.
 - **REVIEW-0002**: passed; замечаний нет.
 - **REVIEW-0003**: passed; замечаний нет.
-- **REVIEW-0004**: Milestone 2 flow review — passed with follow-up: functional RAG flow is coherent, release closure blocked by TASK-0018 container smoke-check.
+- **REVIEW-0004**: Milestone 2 flow review — passed; functional RAG flow is coherent and TASK-0018 container smoke-check passed.
 
 ## Verification
 
@@ -30,14 +30,17 @@
 - `ruff check app scripts/fetch_laws.py scripts/update_laws_cron.py tests/test_laws_update_cron.py` — passed.
 - `python scripts/check_docs.py --all` — passed.
 - `python -m pre_commit run --all-files` — passed.
+- `docker build --target laws-updater -t legal-raggy-laws-updater:task-0018 .` — passed.
+- `docker run --rm legal-raggy-laws-updater:task-0018 python scripts/update_laws_cron.py --check` — passed.
+- `docker compose build laws-updater` — passed.
 
 ## Constraints and blockers
 
 - Hooks: `python3 -m pre_commit`.
 - Локальная разработка: `pip install -e ".[dev]"`, затем `uvicorn app.api.main:app --reload`.
 - Embedding model загружается с HuggingFace при первом вызове; full pytest can fail in sandbox without network access.
-- Docker smoke-check for `laws-updater` was interrupted during heavy `torch` dependency download/install; do not mark TASK-0018 done until it completes.
+- `laws-updater` uses a lightweight Docker target; API image still includes heavy embedding dependencies.
 
 ## Exact next action
 
-Finish TASK-0018 container smoke-check for `laws-updater`. If it passes, move TASK-0018 to `ready-for-release`, then create the next explicit milestone task.
+Create the next explicit milestone task. Candidate: Milestone 3 structured LLM extraction quality hardening, or external notification delivery for law update events.

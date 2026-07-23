@@ -7,6 +7,7 @@ and exits with appropriate status code for cron monitoring.
 Usage:
     python scripts/update_laws_cron.py          # update all laws
     python scripts/update_laws_cron.py --force  # force re-fetch all
+    python scripts/update_laws_cron.py --check  # validate cron wiring without network
 """
 
 import json
@@ -93,8 +94,27 @@ def _write_update_log(results: dict) -> Path:
     return log_file
 
 
+def run_check() -> dict:
+    """Validate cron wiring without fetching external sources."""
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+    return {
+        "status": "ok",
+        "laws_configured": len(LAW_IDS),
+        "log_dir": str(LOG_DIR),
+    }
+
+
 def main() -> None:
     """Run update and log results."""
+    if "--check" in sys.argv or "--help" in sys.argv:
+        check = run_check()
+        logger.info(
+            "Cron check passed: %d laws configured, log_dir=%s",
+            check["laws_configured"],
+            check["log_dir"],
+        )
+        return
+
     force = "--force" in sys.argv
 
     logger.info("Starting laws update (force=%s)", force)

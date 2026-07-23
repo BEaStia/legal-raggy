@@ -105,3 +105,18 @@ def test_run_update_aggregates_statuses_and_notifications(monkeypatch) -> None:
         "changed_law changed to version 01.01.2026",
         "failed_law failed: network",
     ]
+
+
+def test_run_check_validates_wiring_without_fetching(tmp_path: Path, monkeypatch) -> None:
+    log_dir = tmp_path / "logs"
+    monkeypatch.setattr(update_laws_cron, "LOG_DIR", log_dir)
+    monkeypatch.setattr(update_laws_cron, "LAW_IDS", {"law": {}})
+
+    result = update_laws_cron.run_check()
+
+    assert result == {
+        "status": "ok",
+        "laws_configured": 1,
+        "log_dir": str(log_dir),
+    }
+    assert log_dir.is_dir()

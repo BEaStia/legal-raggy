@@ -19,4 +19,4 @@
 | Hybrid retrieval | Milestone 2 plan | TASK-0010 | `tests/test_hybrid_retrieval.py` | ADR-0002 | REVIEW-0004 | `.articles/0010-hybrid-retrieval.md` |
 | Hybrid citations | Milestone 2 plan | TASK-0011, TASK-0019 | `tests/test_hybrid_citations.py`, `tests/test_hybrid_citations_production.py` | ADR-0002 | REVIEW-0004 | `.articles/0011-hybrid-citations.md`, `.articles/0019-hybrid-citations.md` |
 | Evaluation framework | Milestone 2 plan | TASK-0016 | `app.evaluation.metrics.run_evaluation()` | ADR-0002 | REVIEW-0004 | `.articles/0016-evaluation.md` |
-| Real corpus and freshness | Milestone 2 plan | TASK-0017, TASK-0018 | `tests/test_laws_update_cron.py`, Docker smoke-check pending | ADR-0002 | REVIEW-0004 | `.articles/0017-real-laws-fetcher.md`, `.articles/0018-auto-update-laws.md` |
+| Real corpus and freshness | Milestone 2 plan | TASK-0017, TASK-0018 | `tests/test_laws_update_cron.py`, `docker build --target laws-updater`, container `--check` | ADR-0002 | REVIEW-0004 | `.articles/0017-real-laws-fetcher.md`, `.articles/0018-auto-update-laws.md` |
