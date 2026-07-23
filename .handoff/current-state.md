@@ -20,10 +20,12 @@
 - **TASK-0018**: Auto-update laws via cron — structured update status, weekly cron entry, JSON logs, `--check` smoke mode, task article and lightweight Docker `laws-updater` target are implemented.
 - **TASK-0019**: Hybrid citations in production — hybrid retrieval integrated with fallback to keyword, 6 comparison tests.
 - **TASK-0020**: Search endpoint release closure — `POST /api/v1/search` task/article/review/traceability are synchronized; 6 focused API tests cover keyword, hybrid fallback, dense unavailable, result shape and validation.
+- **TASK-0021**: LLM extraction evaluation support — `evaluate_case()` and `run_evaluation()` accept optional `llm_fn`; report includes `avg_architecture_type_accuracy`.
 - **REVIEW-0002**: passed; замечаний нет.
 - **REVIEW-0003**: passed; замечаний нет.
 - **REVIEW-0004**: Milestone 2 flow review — passed; functional RAG flow is coherent and TASK-0018 container smoke-check passed.
 - **REVIEW-0005**: Search endpoint review — passed; no P0/P1 issues.
+- **REVIEW-0006**: LLM extraction evaluation review — passed; no P0/P1 issues in focused eval change.
 
 ## Verification
 
@@ -37,6 +39,8 @@
 - `docker compose build laws-updater` — passed.
 - `python -m pytest tests/test_search_api.py -q` — 6 passed.
 - `ruff check app/api/routes/search.py tests/test_search_api.py` — passed.
+- `python -m pytest tests/test_evaluation.py tests/test_llm_extractor.py -q` — 31 passed.
+- `ruff check app/evaluation/metrics.py tests/test_evaluation.py` — passed.
 
 ## Constraints and blockers
 
@@ -47,4 +51,4 @@
 
 ## Exact next action
 
-Create the next explicit runtime task. Candidate: LLM extraction quality hardening on golden cases, or external notification delivery for law update events.
+Create the next explicit runtime task. Candidate: opt-in real-provider LLM eval runner with JSON report, or external notification delivery for law update events.

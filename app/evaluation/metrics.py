@@ -1,10 +1,12 @@
 """Evaluation metrics for compliance assessment."""
 
+from collections.abc import Callable
 from dataclasses import dataclass
 
 from app.evaluation.datasets import GOLDEN_DATASET, GoldenCase
 from app.rules.architecture_patterns import extract_architecture_profile
 from app.rules.engine import analyze_profile
+from app.rules.llm_extractor import extract_with_llm
 
 
 @dataclass
@@ -12,6 +14,7 @@ class EvalResult:
     """Result of evaluating a single golden case."""
 
     case_id: str
+    architecture_type_match: bool
     trigger_precision: float
     trigger_recall: float
     category_precision: float
@@ -35,10 +38,19 @@ def _precision_recall(predicted: set[str], expected: set[str]) -> tuple[float, f
     return precision, recall
 
 
-def evaluate_case(case: GoldenCase) -> EvalResult:
+def evaluate_case(
+    case: GoldenCase,
+    llm_fn: Callable[[str, str], str] | None = None,
+) -> EvalResult:
     """Evaluate a single golden case."""
-    profile = extract_architecture_profile(case.description)
+    if llm_fn is None:
+        profile = extract_architecture_profile(case.description)
+    else:
+        profile = extract_with_llm(case.description, llm_fn=llm_fn)
+
     assessment = analyze_profile(profile)
+
+    architecture_type_match = profile.architecture_type.value == case.expected_architecture_type
 
     predicted_triggers = {t.id for t in assessment.regulatory_triggers}
     expected_triggers = set(case.expected_triggers)
@@ -62,6 +74,7 @@ def evaluate_case(case: GoldenCase) -> EvalResult:
 
     return EvalResult(
         case_id=case.id,
+        architecture_type_match=architecture_type_match,
         trigger_precision=trigger_precision,
         trigger_recall=trigger_recall,
         category_precision=category_precision,
@@ -72,10 +85,13 @@ def evaluate_case(case: GoldenCase) -> EvalResult:
     )
 
 
-def run_evaluation() -> dict:
+def run_evaluation(llm_fn: Callable[[str, str], str] | None = None) -> dict:
     """Run evaluation over the full golden dataset."""
-    results = [evaluate_case(case) for case in GOLDEN_DATASET]
+    results = [evaluate_case(case, llm_fn=llm_fn) for case in GOLDEN_DATASET]
 
+    avg_architecture_type_accuracy = sum(
+        1.0 if r.architecture_type_match else 0.0 for r in results
+    ) / len(results)
     avg_trigger_precision = sum(r.trigger_precision for r in results) / len(results)
     avg_trigger_recall = sum(r.trigger_recall for r in results) / len(results)
     avg_category_precision = sum(r.category_precision for r in results) / len(results)
@@ -87,6 +103,7 @@ def run_evaluation() -> dict:
 
     return {
         "n_cases": len(results),
+        "avg_architecture_type_accuracy": round(avg_architecture_type_accuracy, 3),
         "avg_trigger_precision": round(avg_trigger_precision, 3),
         "avg_trigger_recall": round(avg_trigger_recall, 3),
         "avg_category_precision": round(avg_category_precision, 3),

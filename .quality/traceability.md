@@ -21,3 +21,9 @@
 | Evaluation framework | Milestone 2 plan | TASK-0016 | `app.evaluation.metrics.run_evaluation()` | ADR-0002 | REVIEW-0004 | `.articles/0016-evaluation.md` |
 | Real corpus and freshness | Milestone 2 plan | TASK-0017, TASK-0018 | `tests/test_laws_update_cron.py`, `docker build --target laws-updater`, container `--check` | ADR-0002 | REVIEW-0004 | `.articles/0017-real-laws-fetcher.md`, `.articles/0018-auto-update-laws.md` |
 | Search API | TASK-0019 handoff | TASK-0020 | `tests/test_search_api.py` | ADR-0002 | REVIEW-0005 | `.articles/0020-search-endpoint.md` |
+
+# Матрица трассировки Milestone 3+
+
+| Requirement | Source | Task | Verification | ADR | Review | Article |
+|---|---|---|---|---|---|---|
+| LLM extraction evaluation | Milestone 3 quality hardening | TASK-0021 | `tests/test_evaluation.py`, `tests/test_llm_extractor.py` | ADR-0002 | REVIEW-0006 | `.articles/0021-llm-extraction-eval.md` |

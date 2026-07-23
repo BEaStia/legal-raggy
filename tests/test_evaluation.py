@@ -1,5 +1,7 @@
 """Tests for evaluation framework."""
 
+import json
+
 from app.evaluation.datasets import GOLDEN_DATASET
 from app.evaluation.metrics import (
     EvalResult,
@@ -69,11 +71,36 @@ class TestEvaluateCase:
         assert result.trigger_precision == 1.0
         assert result.trigger_recall == 1.0
 
+    def test_evaluates_case_with_llm_extractor(self) -> None:
+        case = GOLDEN_DATASET[0]  # B2B SaaS
+
+        def llm_fn(_system_prompt: str, user_prompt: str) -> str:
+            assert case.description in user_prompt
+            return json.dumps(
+                {
+                    "architecture_type": case.expected_architecture_type,
+                    "data_categories": case.expected_data_categories,
+                    "storage_location": "russia",
+                    "admin_access": {
+                        "exists": True,
+                        "exposed_to_internet": True,
+                        "mfa_enabled": False,
+                    },
+                }
+            )
+
+        result = evaluate_case(case, llm_fn=llm_fn)
+
+        assert result.architecture_type_match is True
+        assert result.category_precision == 1.0
+        assert result.category_recall == 1.0
+
 
 class TestRunEvaluation:
     def test_returns_aggregate_metrics(self) -> None:
         report = run_evaluation()
         assert report["n_cases"] == 20
+        assert 0.0 <= report["avg_architecture_type_accuracy"] <= 1.0
         assert 0.0 <= report["avg_trigger_precision"] <= 1.0
         assert 0.0 <= report["avg_trigger_recall"] <= 1.0
         assert 0.0 <= report["avg_category_precision"] <= 1.0
@@ -82,3 +109,19 @@ class TestRunEvaluation:
         assert isinstance(report["total_false_positives"], int)
         assert isinstance(report["total_false_negatives"], int)
         assert len(report["results"]) == 20
+
+    def test_run_evaluation_accepts_llm_extractor(self) -> None:
+        def llm_fn(_system_prompt: str, user_prompt: str) -> str:
+            case = next(case for case in GOLDEN_DATASET if case.description in user_prompt)
+            return json.dumps(
+                {
+                    "architecture_type": case.expected_architecture_type,
+                    "data_categories": case.expected_data_categories,
+                    "has_payments": case.expected_has_payments,
+                    "has_electronic_signature": case.expected_has_electronic_signature,
+                }
+            )
+
+        report = run_evaluation(llm_fn=llm_fn)
+
+        assert report["avg_architecture_type_accuracy"] == 1.0
